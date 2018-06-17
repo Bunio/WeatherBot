@@ -114,7 +114,6 @@ def parseWeatherJson(jsonResponse, city, when):
     return response
 
 def getDate(jsonResponse):
-   # return jsonResponse["dt_txt"].split()[0];
     return jsonResponse["dt_txt"]
 
 def getMainWeather(jsonResponse):
@@ -140,7 +139,15 @@ def debugResponse(response):
     print(response.content)
 
 def getHelp():
-    return "Hi, my name is jWeather ! Please ask me about weather in following format: [CITY] + (optional) [NOW/TODAY/TOMORROW/FORECAST] eg: \"Cracow tomorrow\" "
+    help = ""
+    help += "Hi, my name is jWeather ! Please ask me about weather in following format: \n"
+    help += "[CITY] + (optional) [NOW/TODAY/TOMORROW/FORECAST] eg: \"Cracow tomorrow\" \n"
+    help += " > [CITY] - Name of your city eg. Cracow \n"
+    help += " > [NOW] - Weather at the moment (default) \n"
+    help += " > [TODAY] - Weather for the rest of the day, measured every 3 hours \n"
+    help += " > [TOMORROW] - Weather for tomorrow, measured every 3 hours \n"
+    help += " > [FORECAST] - Weather for the next 5 days, measured every 3 hours \n"
+    return help
 
 
 def sendMessage(channel, message):
