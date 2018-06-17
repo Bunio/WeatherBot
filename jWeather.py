@@ -1,6 +1,7 @@
 import time
 import re
 import requests
+import json
 from slackclient import SlackClient
 
 #CONSTANTS
@@ -30,24 +31,29 @@ def parseDirectMention(message_text):
     return (matches.group(1), matches.group(2).strip()) if matches else (None, None)
 
 def processCommand(command, channel):
+    city = command.split()[0]
+    response = getWeather(city);
+    sendMessage(channel, response)
 
-    default_response = "Not sure what you mean. Try *{}*.".format(COMMAND_WEATHER)
-    response = None
-
-    #if command.startswith(COMMAND_WEATHER):
-
-    print("Processing command...")
-    response = getWeather();
-    sendMessage(channel, response or default_response)
-
-def getWeather():
-    print("Getting weather...")
-
-    city = "Cracow"
+def getWeather(city):
+    print("Getting weather for " + city)
     payload = {'appid' : OPENWEATHERMAP_API_KEY,  'q': city}
     response = requests.get("http://api.openweathermap.org/data/2.5/weather", params = payload)
     debugResponse(response);
-    return "Some weather"
+
+    if response.status_code == 200:
+        return (parseWeatherJson(response.json(), city))
+
+    return "I could not get weather data for \"" + city + "\" city. Are you sure it exists?"
+
+
+def parseWeatherJson(jsonResponse, city):
+    weather = getMainWeather(jsonResponse)
+    response = "Weather in " + city + ": " + weather;
+    return response;
+
+def getMainWeather(jsonResponse):
+    return jsonResponse["weather"][0]["main"]
 
 
 def debugResponse(response):
