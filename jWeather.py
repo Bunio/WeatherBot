@@ -5,8 +5,18 @@ import json
 from slackclient import SlackClient
 
 #CONSTANTS
-RTM_READ_DELAY = 1
 COMMAND_WEATHER = "weather"
+
+# For temperature in Celsius
+UNITS_METRIC = "metric"
+# For temperature in Fahrenheit
+UNITS_IMPERIAL = "imperial"
+
+PARAM_APPID = "appid"
+PARAM_CITY = "q"
+PARAM_UNITS = "units"
+
+
 MENTION_REGEX = "^<@(|[WU].+?)>(.*)"
 
 #API KEYS
@@ -37,7 +47,13 @@ def processCommand(command, channel):
 
 def getWeather(city):
     print("Getting weather for " + city)
-    payload = {'appid' : OPENWEATHERMAP_API_KEY,  'q': city}
+
+    payload = {
+        PARAM_APPID : OPENWEATHERMAP_API_KEY,
+        PARAM_UNITS : UNITS_METRIC,
+        PARAM_CITY: city
+    }
+
     response = requests.get("http://api.openweathermap.org/data/2.5/weather", params = payload)
     debugResponse(response);
 
@@ -48,12 +64,22 @@ def getWeather(city):
 
 
 def parseWeatherJson(jsonResponse, city):
-    weather = getMainWeather(jsonResponse)
-    response = "Weather in " + city + ": " + weather;
-    return response;
+    response = "Weather in " + city + ": " + getMainWeather(jsonResponse)
+    response += ", Temperature: " + getTemperature(jsonResponse);
+    return response
 
 def getMainWeather(jsonResponse):
     return jsonResponse["weather"][0]["main"]
+
+def getTemperature(jsonResponse):
+    temp_min = jsonResponse["main"]["temp_min"]
+    temp_max = jsonResponse["main"]["temp_max"]
+    if temp_min != temp_max :
+        temperatureString = "between " + str(temp_min) + "°C and " + str(temp_max) + "°C"
+    else:
+        temperatureString = str(temp_max) + "°C"
+
+    return temperatureString
 
 
 def debugResponse(response):
@@ -79,6 +105,6 @@ if __name__ == "__main__":
             command, channel = handleCommand(slackClient.rtm_read())
             if command:
                 processCommand(command, channel)
-            time.sleep(RTM_READ_DELAY)
+            time.sleep(1)
     else:
         print("Connection failed!")
