@@ -16,6 +16,11 @@ PARAM_APPID = "appid"
 PARAM_CITY = "q"
 PARAM_UNITS = "units"
 
+WHEN_NOW = "now"
+WHEN_TOMORROW = "tomorrow"
+
+URL_NOW = "http://api.openweathermap.org/data/2.5/weather"
+URL_FORECAST = "http://api.openweathermap.org/data/2.5/forecast"
 
 MENTION_REGEX = "^<@(|[WU].+?)>(.*)"
 
@@ -41,12 +46,20 @@ def parseDirectMention(message_text):
     return (matches.group(1), matches.group(2).strip()) if matches else (None, None)
 
 def processCommand(command, channel):
+
+    commandArray = command.split();
+
     city = command.split()[0]
-    response = getWeather(city);
+    when = WHEN_NOW
+
+    if len(commandArray) > 1:
+     when = command.split()[1]
+
+    response = getWeather(city, when);
     sendMessage(channel, response)
 
-def getWeather(city):
-    print("Getting weather for " + city)
+def getWeather(city, when):
+    print("Getting weather for " + city + " when ? " + when)
 
     payload = {
         PARAM_APPID : OPENWEATHERMAP_API_KEY,
@@ -54,19 +67,32 @@ def getWeather(city):
         PARAM_CITY: city
     }
 
-    response = requests.get("http://api.openweathermap.org/data/2.5/weather", params = payload)
+    when = when.lower();
+
+    URL = URL_NOW if when == WHEN_NOW else URL_FORECAST
+    response = requests.get(URL, params = payload)
     debugResponse(response);
 
+
+    weatherText = "I could not get weather data for \"" + city + "\" city. Are you sure it exists?";
+
     if response.status_code == 200:
-        return (parseWeatherJson(response.json(), city))
+        if when == WHEN_NOW:
+            weatherText = parseWeatherJson(response.json(), city, when)
+        elif when == WHEN_TOMORROW:
+            weatherText = parseWeatherJson(response.json()["list"][1], city, when)
 
-    return "I could not get weather data for \"" + city + "\" city. Are you sure it exists?"
+    return weatherText;
 
 
-def parseWeatherJson(jsonResponse, city):
-    response = "Weather in " + city + ": " + getMainWeather(jsonResponse)
+def parseWeatherJson(jsonResponse, city, when):
+    date = "today" if when == WHEN_NOW else getDate(jsonResponse)
+    response = "Weather in " + city + " (" + date + "): " + getMainWeather(jsonResponse)
     response += ", Temperature: " + getTemperature(jsonResponse);
     return response
+
+def getDate(jsonResponse):
+    return jsonResponse["dt_txt"].split()[0];
 
 def getMainWeather(jsonResponse):
     return jsonResponse["weather"][0]["main"]
