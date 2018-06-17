@@ -1,16 +1,12 @@
 import time
 import re
 import requests
-import json
 from slackclient import SlackClient
 
 #CONSTANTS
 COMMAND_WEATHER = "weather"
-
-# For temperature in Celsius
-UNITS_METRIC = "metric"
-# For temperature in Fahrenheit
-UNITS_IMPERIAL = "imperial"
+UNITS_METRIC = "metric" # For temperature in Celsius
+UNITS_IMPERIAL = "imperial" # For temperature in Fahrenheit
 
 PARAM_APPID = "appid"
 PARAM_CITY = "q"
@@ -53,9 +49,13 @@ def processCommand(command, channel):
     when = WHEN_NOW
 
     if len(commandArray) > 1:
-     when = command.split()[1]
+     when = commandArray[1]
 
-    response = getWeather(city, when);
+    if(city.lower() == "help"):
+        response = getHelp()
+    else:
+        response = getWeather(city, when)
+
     sendMessage(channel, response)
 
 def getWeather(city, when):
@@ -73,8 +73,7 @@ def getWeather(city, when):
     response = requests.get(URL, params = payload)
     debugResponse(response);
 
-
-    weatherText = "I could not get weather data for \"" + city + "\" city. Are you sure it exists?";
+    weatherText = "I could not get weather data for \"" + city + "\" city. Say \"Help\" to get more info";
 
     if response.status_code == 200:
         if when == WHEN_NOW:
@@ -115,6 +114,10 @@ def debugResponse(response):
     print(response.headers)
     print("CONTENT:")
     print(response.content)
+
+def getHelp():
+    return "Hi, my name is jWeather ! Please ask me about weather in following format: [CITY] + (optional) [NOW/TOMORROW/FORECAST] eg: \"Cracow tomorrow\" "
+
 
 def sendMessage(channel, message):
     slackClient.api_call(

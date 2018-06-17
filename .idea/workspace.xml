@@ -16,8 +16,8 @@
       <file leaf-file-name="jWeather.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/jWeather.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="298">
-              <caret line="87" column="47" lean-forward="true" selection-start-line="87" selection-start-column="47" selection-end-line="87" selection-end-column="47" />
+            <state relative-caret-position="391">
+              <caret line="104" column="48" lean-forward="true" selection-start-line="104" selection-start-column="48" selection-end-line="104" selection-end-column="48" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -216,11 +216,11 @@
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.18622175" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Event Log" sideWeight="0.17814855" side_tool="true" visible="true" weight="0.32415903" />
+      <window_info anchor="bottom" id="Event Log" sideWeight="0.17976318" side_tool="true" visible="true" weight="0.32415903" />
       <window_info anchor="bottom" id="Find" order="1" sideWeight="0.4994618" weight="0.32925585" />
       <window_info anchor="bottom" id="Version Control" />
       <window_info anchor="bottom" id="Python Console" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.82185143" visible="true" weight="0.32415903" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.8202368" weight="0.32415903" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" />
       <window_info id="Favorites" side_tool="true" />
@@ -239,8 +239,8 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/jWeather.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="298">
-          <caret line="87" column="47" lean-forward="true" selection-start-line="87" selection-start-column="47" selection-end-line="87" selection-end-column="47" />
+        <state relative-caret-position="391">
+          <caret line="104" column="48" lean-forward="true" selection-start-line="104" selection-start-column="48" selection-end-line="104" selection-end-column="48" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
