@@ -1,7 +1,12 @@
 import time
 import re
 import requests
+
+from datetime import datetime
+from datetime import timedelta
+from time import strftime
 from slackclient import SlackClient
+
 
 #CONSTANTS
 COMMAND_WEATHER = "weather"
@@ -13,7 +18,9 @@ PARAM_CITY = "q"
 PARAM_UNITS = "units"
 
 WHEN_NOW = "now"
+WHEN_TODAY = "today"
 WHEN_TOMORROW = "tomorrow"
+WHEN_FORECAST = "forecast"
 
 URL_NOW = "http://api.openweathermap.org/data/2.5/weather"
 URL_FORECAST = "http://api.openweathermap.org/data/2.5/forecast"
@@ -71,27 +78,44 @@ def getWeather(city, when):
 
     URL = URL_NOW if when == WHEN_NOW else URL_FORECAST
     response = requests.get(URL, params = payload)
-    debugResponse(response);
+    #debugResponse(response);
 
     weatherText = "I could not get weather data for \"" + city + "\" city. Say \"Help\" to get more info";
 
     if response.status_code == 200:
         if when == WHEN_NOW:
             weatherText = parseWeatherJson(response.json(), city, when)
+        elif when == WHEN_TODAY:
+            date = datetime.now()
+            weatherText = parseWeatherJsonWithDate(response.json(), city, when, date.strftime("%Y-%m-%d"))
         elif when == WHEN_TOMORROW:
-            weatherText = parseWeatherJson(response.json()["list"][1], city, when)
+            date = datetime.now() + timedelta(days=1)
+            weatherText = parseWeatherJsonWithDate(response.json(), city, when, date.strftime("%Y-%m-%d"))
+        elif when == WHEN_FORECAST:
+            weatherText = ""
+            for listItem in response.json()["list"]:
+                weatherText += parseWeatherJson(listItem, city, when) + "\n"
 
     return weatherText;
 
 
+def parseWeatherJsonWithDate(jsonResponse, city, when, date):
+    weatherText = ""
+    for listItem in jsonResponse["list"]:
+        if listItem["dt_txt"].split()[0] == date:
+            weatherText += parseWeatherJson(listItem, city, when) + "\n"
+
+    return weatherText;
+
 def parseWeatherJson(jsonResponse, city, when):
-    date = "today" if when == WHEN_NOW else getDate(jsonResponse)
+    date = "now" if when == WHEN_NOW else getDate(jsonResponse)
     response = "Weather in " + city + " (" + date + "): " + getMainWeather(jsonResponse)
     response += ", Temperature: " + getTemperature(jsonResponse);
     return response
 
 def getDate(jsonResponse):
-    return jsonResponse["dt_txt"].split()[0];
+   # return jsonResponse["dt_txt"].split()[0];
+    return jsonResponse["dt_txt"]
 
 def getMainWeather(jsonResponse):
     return jsonResponse["weather"][0]["main"]
@@ -116,7 +140,7 @@ def debugResponse(response):
     print(response.content)
 
 def getHelp():
-    return "Hi, my name is jWeather ! Please ask me about weather in following format: [CITY] + (optional) [NOW/TOMORROW/FORECAST] eg: \"Cracow tomorrow\" "
+    return "Hi, my name is jWeather ! Please ask me about weather in following format: [CITY] + (optional) [NOW/TODAY/TOMORROW/FORECAST] eg: \"Cracow tomorrow\" "
 
 
 def sendMessage(channel, message):
